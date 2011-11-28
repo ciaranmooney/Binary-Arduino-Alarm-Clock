@@ -4,6 +4,8 @@ use while nothing is read on serial line. It should wait until
 time inputted, then move into main loop.
 
 Main loop should update every second.
+
+input is "hX,mXX"
 */
 
 #include <TimerOne.h>
@@ -22,6 +24,7 @@ void setup() {
         //set pins to output 
         Serial.begin(115200);
         Serial.flush();
+        Serial.println("Waiting for input: ");
         pinMode(latchPin, OUTPUT);
         pinMode(clockPin, OUTPUT);
         pinMode(dataPin, OUTPUT);
@@ -72,17 +75,19 @@ void setTime(char* data) {
         digitalWrite(latchPin, LOW);
   	if ((data[0] == 'h') || (data[0] == 'H')) {
     		int Ans = strtol(data+1, NULL, 10);
+                Serial.print(Ans);
     		hour = constrain(Ans,0,11);
     		Serial.print("hour: ");
     		Serial.println(hour);
-                shiftOut(dataPin, clockPin, LSBFIRST, hour);
+                //shiftOut(dataPin, clockPin, LSBFIRST, hour);
   	}
   	if ((data[0] == 'm') || (data[0] == 'M')) {
     		int Ans = strtol(data+1, NULL, 10);
+                Serial.print(Ans);
     		minute = constrain(Ans,0,59);
     		Serial.print("minute: ");
     		Serial.println(minute);
-                shiftOut(dataPin, clockPin, LSBFIRST, minute);
+                //shiftOut(dataPin, clockPin, LSBFIRST, minute);
   	}
         digitalWrite(latchPin, HIGH);
         sec = (minute * 60) + (hour *3600);
@@ -93,9 +98,9 @@ void updateTime () {
   sec = sec + 1;
   minute = (sec / 60) % 60;
   hour = (sec / 3600) % 12;
-  //Serial.println(sec);
-  //Serial.println(minute);
-  //Serial.println(hour);
+  Serial.println(sec);
+  Serial.println(minute); //These won't print anything of sense because they are bytes
+  Serial.println(hour);
   digitalWrite(latchPin, LOW);
   shiftOut(dataPin, clockPin, LSBFIRST, hour);
   shiftOut(dataPin, clockPin, LSBFIRST, minute);
